@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Encrypto</string>
+    <string name="login">LOGIN</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="signup">SIGNUP</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_downloader">Downloader</string>
+    <string name="enter_name">Enter Name</string>
+</resources>
