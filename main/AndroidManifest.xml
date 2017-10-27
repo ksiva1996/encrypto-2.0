@@ -30,7 +30,6 @@
         <activity android:name=".Check">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -38,7 +37,13 @@
             android:name=".Downloader"
             android:label="@string/title_activity_downloader"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".SendFile"></activity>
+        <activity android:name=".SendFile">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

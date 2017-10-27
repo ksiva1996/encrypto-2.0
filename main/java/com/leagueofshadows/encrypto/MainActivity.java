@@ -127,39 +127,7 @@ public class MainActivity extends AppCompatActivity implements Refresh {
                     builder.create().show();
                 }
                 else {
-                    String url = Environment.getExternalStorageDirectory().getPath()+"/Encrypto/decrypted"+file.getName();
-                    File f = new File(url);
-                    Uri uri = Uri.fromFile(f);
-
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    if (url.contains(".doc") || url.contains(".docx")) {
-                        intent.setDataAndType(uri, "application/msword");
-                    } else if (url.contains(".pdf")) {
-                        intent.setDataAndType(uri, "application/pdf");
-                    } else if (url.contains(".ppt") || url.contains(".pptx")) {
-                        intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
-                    } else if (url.contains(".xls") || url.contains(".xlsx")) {
-                        intent.setDataAndType(uri, "application/vnd.ms-excel");
-                    } else if (url.contains(".zip") || url.contains(".rar")) {
-                        intent.setDataAndType(uri, "application/x-wav");
-                    } else if (url.contains(".rtf")) {
-                        intent.setDataAndType(uri, "application/rtf");
-                    } else if (url.contains(".wav") || url.contains(".mp3")) {
-                        intent.setDataAndType(uri, "audio/x-wav");
-                    } else if (url.contains(".gif")) {
-                        intent.setDataAndType(uri, "image/gif");
-                    } else if (url.contains(".jpg") || url.contains(".jpeg") || url.contains(".png")) {
-                        intent.setDataAndType(uri, "image/jpeg");
-                    } else if (url.contains(".txt")) {
-                        intent.setDataAndType(uri, "text/plain");
-                    } else if (url.contains(".3gp") || url.contains(".mpg") || url.contains(".mpeg") || url.contains(".mpe") || url.contains(".mp4") || url.contains(".avi")) {
-                        intent.setDataAndType(uri, "video/*");
-                    } else {
-                        intent.setDataAndType(uri, "*/*");
-                    }
-
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    openFile(file);
                 }
             }
         });
@@ -190,6 +158,42 @@ public class MainActivity extends AppCompatActivity implements Refresh {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu);
         return true;
+    }
+
+    void openFile(FilesObject file)
+    {
+        String url = Environment.getExternalStorageDirectory().getPath()+"/Encrypto/decrypted/"+file.getName();
+        File f = new File(url);
+        Uri uri = Uri.fromFile(f);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        if (url.contains(".doc") || url.contains(".docx")) {
+            intent.setDataAndType(uri, "application/msword");
+        } else if (url.contains(".pdf")) {
+            intent.setDataAndType(uri, "application/pdf");
+        } else if (url.contains(".ppt") || url.contains(".pptx")) {
+            intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
+        } else if (url.contains(".xls") || url.contains(".xlsx")) {
+            intent.setDataAndType(uri, "application/vnd.ms-excel");
+        } else if (url.contains(".zip") || url.contains(".rar")) {
+            intent.setDataAndType(uri, "application/x-wav");
+        } else if (url.contains(".rtf")) {
+            intent.setDataAndType(uri, "application/rtf");
+        } else if (url.contains(".wav") || url.contains(".mp3")) {
+            intent.setDataAndType(uri, "audio/x-wav");
+        } else if (url.contains(".gif")) {
+            intent.setDataAndType(uri, "image/gif");
+        } else if (url.contains(".jpg") || url.contains(".jpeg") || url.contains(".png")) {
+            intent.setDataAndType(uri, "image/jpeg");
+        } else if (url.contains(".txt")) {
+            intent.setDataAndType(uri, "text/plain");
+        } else if (url.contains(".3gp") || url.contains(".mpg") || url.contains(".mpeg") || url.contains(".mpe") || url.contains(".mp4") || url.contains(".avi")) {
+            intent.setDataAndType(uri, "video/*");
+        } else {
+            intent.setDataAndType(uri, "*/*");
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override
@@ -264,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements Refresh {
                     if(!file.exists())
                         file.mkdir();
                 }
-
                 else
                     finish();
             }
@@ -355,8 +358,6 @@ public class MainActivity extends AppCompatActivity implements Refresh {
             pd.show();
         }
 
-
-
         @Override
         protected Boolean doInBackground(String... params) {
             try
@@ -417,6 +418,20 @@ public class MainActivity extends AppCompatActivity implements Refresh {
             if(bool)
             {
                 db.updateDecrpt(file.getLocalId());
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("Would you like to open the file?");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openFile(file);
+                    }
+                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).setCancelable(true);
+                builder.create().show();
             }
             else
             {
@@ -488,4 +503,3 @@ public class MainActivity extends AppCompatActivity implements Refresh {
         }
     }
 }
-

@@ -3,7 +3,9 @@ package com.leagueofshadows.encrypto;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -67,31 +70,36 @@ public class Downloader extends AppCompatActivity implements Refresh{
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(Downloader.this);
-                builder.setMessage("Enter password to download and decrypt the file");
-                View v = LayoutInflater.from(Downloader.this).inflate(R.layout.password,null);
-                builder.setView(v);
-                final TextView password = (TextView)v.findViewById(R.id.password);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(check(password.getText().toString())) {
-                            FilesObject file = files.get(position);
-                            DownloadFile df = new DownloadFile(file,password.getText().toString());
-                            df.execute();
+                final FilesObject file = files.get(position);
+                if(file.getDownload()==0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Downloader.this);
+                    builder.setMessage("Enter password to download and decrypt the file");
+                    View v = LayoutInflater.from(Downloader.this).inflate(R.layout.password, null);
+                    builder.setView(v);
+                    final TextView password = (TextView) v.findViewById(R.id.password);
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (check(password.getText().toString())) {
+
+                                DownloadFile df = new DownloadFile(file, password.getText().toString());
+                                df.execute();
+                            } else {
+                                Toast.makeText(Downloader.this, "Wrong Password", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                        else
-                        {
-                            Toast.makeText(Downloader.this,"Wrong Password",Toast.LENGTH_SHORT).show();
+                    }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                         }
-                    }
-                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).setCancelable(true);
-                builder.create().show();
+                    }).setCancelable(true);
+                    builder.create().show();
+                }
+                else
+                {
+                    openFile(file);
+                }
             }
         });
     }
@@ -132,6 +140,41 @@ public class Downloader extends AppCompatActivity implements Refresh{
         Toast.makeText(this,"you have new files",Toast.LENGTH_SHORT).show();
     }
 
+    void openFile(FilesObject file)
+    {
+        String url = Environment.getExternalStorageDirectory().getPath()+"/Encrypto/decrypted/"+file.getName();
+        File f = new File(url);
+        Uri uri = Uri.fromFile(f);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        if (url.contains(".doc") || url.contains(".docx")) {
+            intent.setDataAndType(uri, "application/msword");
+        } else if (url.contains(".pdf")) {
+            intent.setDataAndType(uri, "application/pdf");
+        } else if (url.contains(".ppt") || url.contains(".pptx")) {
+            intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
+        } else if (url.contains(".xls") || url.contains(".xlsx")) {
+            intent.setDataAndType(uri, "application/vnd.ms-excel");
+        } else if (url.contains(".zip") || url.contains(".rar")) {
+            intent.setDataAndType(uri, "application/x-wav");
+        } else if (url.contains(".rtf")) {
+            intent.setDataAndType(uri, "application/rtf");
+        } else if (url.contains(".wav") || url.contains(".mp3")) {
+            intent.setDataAndType(uri, "audio/x-wav");
+        } else if (url.contains(".gif")) {
+            intent.setDataAndType(uri, "image/gif");
+        } else if (url.contains(".jpg") || url.contains(".jpeg") || url.contains(".png")) {
+            intent.setDataAndType(uri, "image/jpeg");
+        } else if (url.contains(".txt")) {
+            intent.setDataAndType(uri, "text/plain");
+        } else if (url.contains(".3gp") || url.contains(".mpg") || url.contains(".mpeg") || url.contains(".mpe") || url.contains(".mp4") || url.contains(".avi")) {
+            intent.setDataAndType(uri, "video/*");
+        } else {
+            intent.setDataAndType(uri, "*/*");
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
     private class CustomAdapter extends BaseAdapter
     {
@@ -280,6 +323,22 @@ public class Downloader extends AppCompatActivity implements Refresh{
             if(bool)
             {
                 db.updateDecrpt(file.getLocalId());
+                AlertDialog.Builder builder = new AlertDialog.Builder(Downloader.this);
+                builder.setMessage("Would you like to open the file?");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openFile(file);
+                        files.remove(file);
+                        adapter.notifyDataSetChanged();
+                    }
+                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).setCancelable(true);
+                builder.create().show();
             }
             else
             {

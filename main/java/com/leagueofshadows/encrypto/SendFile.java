@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -62,6 +63,20 @@ public class SendFile extends AppCompatActivity {
         selectFile = (Button)findViewById(R.id.selectfile);
         sendFile = (Button)findViewById(R.id.send);
         filename = (TextView)findViewById(R.id.filename);
+
+        Intent i = getIntent();
+        String action = i.getAction();
+        String type = i.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            Uri uri = i.getParcelableExtra(Intent.EXTRA_STREAM);
+
+            if (uri != null) {
+                file = new File(uri.getPath());
+                filename.setText(file.getName());
+            }
+        }
+
         selectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +179,6 @@ public class SendFile extends AppCompatActivity {
 
     private class EncryptFile extends AsyncTask<String,Boolean,Boolean> {
 
-
         private File inFile;
         private final Cipher cipher;
         SecretKey key;
@@ -255,7 +269,6 @@ public class SendFile extends AppCompatActivity {
     }
 
     private class UploadFile extends AsyncTask<String,Boolean,Boolean> {
-
 
         private File file;
         String secretKeyString;
@@ -353,7 +366,6 @@ public class SendFile extends AppCompatActivity {
             int bytesRead,bytesAvailable,bufferSize;
             byte[] buffer;
             int maxBufferSize = 1024 * 1024;
-
 
             try {
                 FileInputStream fileInputStream = new FileInputStream(file);

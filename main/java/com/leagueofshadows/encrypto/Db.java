@@ -102,12 +102,16 @@ class Db extends SQLiteOpenHelper {
 
     void updateDownload(String id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.rawQuery("UPDATE "+TABLE_NAME+" SET "+COLUMN_DOWNLOAD+" = ? WHERE "+COLUMN_ID+" = ?",new String[]{"1",id});
+        ContentValues update = new ContentValues();
+        update.put(COLUMN_DOWNLOAD,1);
+        db.update(TABLE_NAME,update,COLUMN_ID+" = ?",new String[]{id});
     }
 
     void updateDecrpt(String id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.rawQuery("UPDATE "+TABLE_NAME+" SET "+COLUMN_Decrypt+" = ? WHERE "+COLUMN_ID+" = ?",new String[]{"1",id});
+        ContentValues update = new ContentValues();
+        update.put(COLUMN_Decrypt,1);
+        db.update(TABLE_NAME,update,COLUMN_ID+" = ?",new String[]{id});
     }
 
     void drop() {
